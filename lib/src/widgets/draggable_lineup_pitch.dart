@@ -140,6 +140,10 @@ class _DraggableLineupPitchState extends State<DraggableLineupPitch> {
   /// Whether the formation has been modified by dragging.
   bool _isFreeFormation = false;
 
+  /// Drag trail tracking.
+  Offset? _dragStartPixel;
+  Offset? _dragCurrentPixel;
+
   /// Cached default formation positions to avoid recalculating on every
   /// drag update.
   Map<int, NormalizedPoint> _defaultPositions = const {};
@@ -211,6 +215,19 @@ class _DraggableLineupPitchState extends State<DraggableLineupPitch> {
                   painter: PitchPainter(color: widget.config.lineColor),
                 ),
               ),
+              // Drag trail
+              if (_draggingPlayerId != null &&
+                  _dragStartPixel != null &&
+                  _dragCurrentPixel != null)
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _DragTrailPainter(
+                      start: _dragStartPixel!,
+                      end: _dragCurrentPixel!,
+                      color: widget.team.shirtColor ?? Colors.white,
+                    ),
+                  ),
+                ),
               ..._buildDraggablePlayers(
                 constraints.maxWidth,
                 constraints.maxHeight,
@@ -313,8 +330,14 @@ class _DraggableLineupPitchState extends State<DraggableLineupPitch> {
 
   void _handleDragStart(int playerId) {
     widget.haptic.fire();
+    final pos = _resolvePosition(playerId);
     setState(() {
       _draggingPlayerId = playerId;
+      if (pos != null) {
+        // We'll set actual pixel positions on first update
+        _dragStartPixel = null;
+        _dragCurrentPixel = null;
+      }
     });
   }
 
@@ -336,6 +359,12 @@ class _DraggableLineupPitchState extends State<DraggableLineupPitch> {
 
     setState(() {
       _customPositions[playerId] = PitchPosition(x: newX, y: newY);
+      // Set start pixel on first drag update
+      _dragStartPixel ??= Offset(
+        currentLeft + DragVisuals.nodeWidth / 2,
+        currentTop + DragVisuals.nodeHeight / 2,
+      );
+      _dragCurrentPixel = Offset(newX * pitchWidth, newY * pitchHeight);
     });
 
     if (!_isFreeFormation) {
@@ -347,7 +376,50 @@ class _DraggableLineupPitchState extends State<DraggableLineupPitch> {
   void _handleDragEnd() {
     setState(() {
       _draggingPlayerId = null;
+      _dragStartPixel = null;
+      _dragCurrentPixel = null;
     });
     widget.onPositionsChanged?.call(Map.unmodifiable(_customPositions));
   }
+}
+
+/// Paints a fading trail line from the drag start to the current position.
+class _DragTrailPainter extends CustomPainter {
+  _DragTrailPainter({
+    required this.start,
+    required this.end,
+    required this.color,
+  });
+
+  final Offset start;
+  final Offset end;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if ((end - start).distance < 5) return;
+
+    final paint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          color.withValues(alpha: 0.0),
+          color.withValues(alpha: 0.4),
+        ],
+      ).createShader(Rect.fromPoints(start, end))
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    canvas.drawLine(start, end, paint);
+
+    // Small circle at start (origin indicator)
+    final dotPaint = Paint()
+      ..color = color.withValues(alpha: 0.3)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(start, 4, dotPaint);
+  }
+
+  @override
+  bool shouldRepaint(_DragTrailPainter oldDelegate) =>
+      start != oldDelegate.start || end != oldDelegate.end;
 }

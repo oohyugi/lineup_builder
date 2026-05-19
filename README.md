@@ -1,52 +1,87 @@
 # lineup_builder
 
-A reusable Flutter package for rendering football/soccer lineup formations on a pitch. Bring your own data, map it to `LineupPlayer`, and render.
+A reusable Flutter package for rendering football/soccer lineup formations on a pitch. Fully isolated from app-specific models — bring your own data, map it to `LineupPlayer`, and render.
+
+## Screenshots
+
+| Builder Mode |
+|:---:|
+| ![Builder](screenshots/builder-mode.png) |
 
 ## Features
 
 - **Display mode** — Render match lineups with player stats (rating, goals, assists, cards, substitutions)
-- **Builder mode** (planned) — Drag-and-drop lineup builder for custom formations
+- **Builder mode** — Drag-and-drop lineup builder for custom formations with drag trail effect
+- **Tactical mode** — Two-team tactical board where all players can be dragged anywhere
+- **Animated transitions** — Smooth position animation when formations change
+- **Drag trail** — Meteor-like trail from start position to current drag position
+- **Haptic feedback** — Configurable haptic on drag start (light, medium, heavy, selection, vibrate)
 - **Customizable** — Override pitch colors, sizes, player node rendering
 - **Isolated** — No dependency on any app entity/model. Uses its own `LineupPlayer` model.
 
-## Usage
+## Installation
+
+```yaml
+dependencies:
+  lineup_builder:
+    git:
+      url: https://github.com/oohyugi/lineup_builder.git
+```
+
+## Quick Start
 
 ```dart
 import 'package:lineup_builder/lineup_builder.dart';
+```
 
-LineupPitch(
+### Display Mode (Two Teams)
+
+```dart
+LineupBuilder.display(
   homeTeam: LineupTeam(
     name: 'Arsenal',
     formation: '4-3-3',
     shirtColor: Colors.red,
     players: [
-      LineupPlayer(id: 1, name: 'Raya', number: 22, position: 'Goalkeeper', gridPosition: 1),
-      LineupPlayer(id: 2, name: 'White', number: 4, position: 'Defender', gridPosition: 31),
-      // ... more players
+      LineupPlayer(id: 1, number: 22, position: PlayerPosition.goalkeeper, name: 'Raya'),
+      LineupPlayer(id: 2, number: 4, position: PlayerPosition.defender, name: 'White'),
+      // ...
     ],
   ),
-  awayTeam: LineupTeam(
-    name: 'Chelsea',
-    formation: '4-2-3-1',
-    shirtColor: Colors.blue,
-    players: [...],
-  ),
-  onPlayerTap: (player) {
-    // Navigate to player detail
-  },
+  awayTeam: chelseaTeam,
+  onPlayerTap: (player) => print(player.name),
 )
 ```
 
-## Custom Player Node
-
-Override the default player rendering:
+### Single Team (Full Pitch)
 
 ```dart
-LineupPitch(
-  homeTeam: homeTeam,
-  awayTeam: awayTeam,
-  playerNodeBuilder: (player, shirtColor) {
-    return MyCustomPlayerWidget(player: player);
+LineupBuilder.single(team: arsenalTeam)
+```
+
+### Builder Mode (Drag & Drop)
+
+```dart
+LineupBuilder.editable(
+  team: myTeam,
+  onPlayerTap: (player) => swapPlayer(player),
+  onPositionsChanged: (positions) => saveFormation(positions),
+  onFormationChanged: (f) => print(f), // "Free" after drag
+  haptic: const HapticConfig(type: HapticType.medium),
+)
+```
+
+### Tactical Board (Two-Team Analysis)
+
+```dart
+LineupBuilder.tactical(
+  homeTeam: arsenalTeam,
+  awayTeam: chelseaTeam,
+  onTacticalPlayerTap: (ref) {
+    print('${ref.player.name} (${ref.side})');
+  },
+  onTacticalPositionsChanged: (positions) {
+    // positions.homePositions + positions.awayPositions
   },
 )
 ```
@@ -54,26 +89,60 @@ LineupPitch(
 ## Configuration
 
 ```dart
-LineupPitch(
-  homeTeam: homeTeam,
-  awayTeam: awayTeam,
+LineupBuilder.editable(
+  team: myTeam,
   config: LineupPitchConfig(
     pitchColor: Colors.green.shade900,
     pitchHeight: 600,
     playerAvatarSize: 32,
     borderRadius: 12,
   ),
+  haptic: const HapticConfig(
+    enabled: true,
+    type: HapticType.light,
+  ),
+)
+```
+
+## Custom Player Node
+
+```dart
+LineupBuilder.display(
+  homeTeam: myTeam,
+  playerNodeBuilder: (player, shirtColor) {
+    return MyCustomPlayerWidget(player: player);
+  },
 )
 ```
 
 ## Models
 
-- `LineupPlayer` — Player data (name, number, stats, badges)
-- `LineupTeam` — Team data (name, formation, players, shirt color)
-- `LineupPitchConfig` — Visual configuration
+| Model | Description |
+|-------|-------------|
+| `LineupPlayer` | Player data (name, number, position, stats) |
+| `LineupTeam` | Team data (name, formation, players, shirt color) |
+| `LineupPitchConfig` | Visual configuration (colors, sizes, padding) |
+| `HapticConfig` | Haptic feedback settings |
+| `PlayerPosition` | Enum: goalkeeper, defender, midfielder, forward |
 
 ## Widgets
 
-- `LineupPitch` — Main widget rendering the full pitch with both teams
-- `PlayerNode` — Individual player on the pitch (can be used standalone)
-- `PitchPainter` — CustomPainter for pitch markings
+| Widget | Description |
+|--------|-------------|
+| `LineupBuilder` | Main entry point with `.display`, `.single`, `.editable`, `.tactical` |
+| `LineupPitch` | Lower-level read-only pitch widget |
+| `DraggableLineupPitch` | Lower-level draggable pitch (single team) |
+| `TacticalBoardPitch` | Lower-level two-team draggable board |
+| `PlayerNode` | Individual player avatar with stat badges |
+| `PitchPainter` | CustomPainter for pitch markings |
+
+## Drag Interaction
+
+- **On drag start**: Haptic feedback + scale up (1.1×)
+- **During drag**: Trail line from start to current position (gradient fade)
+- **On drag end**: Trail disappears, position saved
+- **Formation change**: Players animate smoothly to new positions (300ms easeOutCubic)
+
+## License
+
+MIT
