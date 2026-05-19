@@ -17,11 +17,11 @@ import 'package:lineup_builder/src/widgets/player_node.dart';
 ///
 /// ```dart
 /// // Center of the pitch
-/// const center = PlayerPosition(x: 0.5, y: 0.5);
+/// const center = PitchPosition(x: 0.5, y: 0.5);
 /// ```
-class PlayerPosition {
+class PitchPosition {
   /// Creates a normalized player position.
-  const PlayerPosition({required this.x, required this.y});
+  const PitchPosition({required this.x, required this.y});
 
   /// Horizontal position (0.0 = left edge, 1.0 = right edge).
   final double x;
@@ -110,9 +110,9 @@ class DraggableLineupPitch extends StatefulWidget {
   /// Called when player positions change after a drag completes.
   ///
   /// The map key is the player's [LineupPlayer.id], and the value is the
-  /// new normalized [PlayerPosition]. Only contains entries for players
+  /// new normalized [PitchPosition]. Only contains entries for players
   /// that have been manually repositioned.
-  final void Function(Map<int, PlayerPosition> positions)? onPositionsChanged;
+  final void Function(Map<int, PitchPosition> positions)? onPositionsChanged;
 
   /// Called when the formation label changes.
   ///
@@ -132,7 +132,7 @@ class DraggableLineupPitch extends StatefulWidget {
 
 class _DraggableLineupPitchState extends State<DraggableLineupPitch> {
   /// Custom positions for players that have been dragged.
-  final Map<int, PlayerPosition> _customPositions = {};
+  final Map<int, PitchPosition> _customPositions = {};
 
   /// ID of the player currently being dragged, or null if no drag active.
   int? _draggingPlayerId;
@@ -335,7 +335,7 @@ class _DraggableLineupPitchState extends State<DraggableLineupPitch> {
         (newCenterY / pitchHeight).clamp(DragVisuals.minY, DragVisuals.maxY);
 
     setState(() {
-      _customPositions[playerId] = PlayerPosition(x: newX, y: newY);
+      _customPositions[playerId] = PitchPosition(x: newX, y: newY);
     });
 
     if (!_isFreeFormation) {

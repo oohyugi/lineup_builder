@@ -88,34 +88,24 @@ class PositionedPlayer {
 
 /// Splits the goalkeeper from the outfield players.
 ///
-/// The goalkeeper is identified by:
-/// 1. A position string containing "goalkeeper" (case-insensitive), or
-/// 2. A position string equal to "G", or
-/// 3. A grid position below 25 (lowest in the formation).
+/// The goalkeeper is identified by having
+/// [PlayerPosition.goalkeeper] as their position.
 ///
 /// Returns `(goalkeeper, outfieldPlayers)`. The goalkeeper may be `null`
-/// if the input is empty.
+/// if no player has the goalkeeper position.
 ({LineupPlayer? gk, List<LineupPlayer> outfield}) splitGoalkeeper(
-  List<LineupPlayer> sortedPlayers,
+  List<LineupPlayer> players,
 ) {
-  if (sortedPlayers.isEmpty) {
+  if (players.isEmpty) {
     return (gk: null, outfield: const []);
   }
 
-  final candidate = sortedPlayers.first;
-  final positionLower = candidate.position.toLowerCase();
-  final isGoalkeeper = positionLower.contains('goalkeeper') ||
-      candidate.position == 'G' ||
-      candidate.gridPosition < _gridPositionGoalkeeperThreshold;
-
-  if (isGoalkeeper) {
-    return (gk: candidate, outfield: sortedPlayers.sublist(1));
+  final candidate = players.first;
+  if (candidate.position == PlayerPosition.goalkeeper) {
+    return (gk: candidate, outfield: players.sublist(1));
   }
-  return (gk: null, outfield: sortedPlayers);
+  return (gk: null, outfield: players);
 }
-
-/// Grid position values below this threshold are treated as goalkeepers.
-const int _gridPositionGoalkeeperThreshold = 25;
 
 /// Calculates normalized positions for a team's players based on a formation
 /// string and layout bounds.
@@ -140,10 +130,7 @@ List<PositionedPlayer> calculateFormationLayout({
 }) {
   if (players.isEmpty) return const [];
 
-  final sortedPlayers = List<LineupPlayer>.from(players)
-    ..sort((a, b) => a.gridPosition.compareTo(b.gridPosition));
-
-  final split = splitGoalkeeper(sortedPlayers);
+  final split = splitGoalkeeper(players);
   final formationRows = parseFormation(formation);
 
   final result = <PositionedPlayer>[];

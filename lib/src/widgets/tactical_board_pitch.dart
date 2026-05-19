@@ -33,12 +33,12 @@ class TacticalPositions {
   /// Custom positions for home team players (playerId → position).
   ///
   /// Only contains entries for players that have been manually moved.
-  final Map<int, PlayerPosition> homePositions;
+  final Map<int, PitchPosition> homePositions;
 
   /// Custom positions for away team players (playerId → position).
   ///
   /// Only contains entries for players that have been manually moved.
-  final Map<int, PlayerPosition> awayPositions;
+  final Map<int, PitchPosition> awayPositions;
 }
 
 /// A full-pitch tactical board where both teams can be freely repositioned.
@@ -138,10 +138,10 @@ class TacticalBoardPitch extends StatefulWidget {
 /// via a [GlobalKey].
 class TacticalBoardPitchState extends State<TacticalBoardPitch> {
   /// Custom positions for home team players.
-  final Map<int, PlayerPosition> _homePositions = {};
+  final Map<int, PitchPosition> _homePositions = {};
 
   /// Custom positions for away team players.
-  final Map<int, PlayerPosition> _awayPositions = {};
+  final Map<int, PitchPosition> _awayPositions = {};
 
   /// The player currently being dragged, or null.
   ({int id, TacticalTeamSide side})? _dragging;
@@ -281,7 +281,7 @@ class TacticalBoardPitchState extends State<TacticalBoardPitch> {
     LineupTeam team,
     TacticalTeamSide side,
     Map<int, NormalizedPoint> defaults,
-    Map<int, PlayerPosition> customs,
+    Map<int, PitchPosition> customs,
     double pitchWidth,
     double pitchHeight,
   ) {
@@ -303,7 +303,7 @@ class TacticalBoardPitchState extends State<TacticalBoardPitch> {
     TacticalTeamSide side,
     Color? shirtColor,
     Map<int, NormalizedPoint> defaults,
-    Map<int, PlayerPosition> customs,
+    Map<int, PitchPosition> customs,
     double pitchWidth,
     double pitchHeight,
   ) {
@@ -352,7 +352,7 @@ class TacticalBoardPitchState extends State<TacticalBoardPitch> {
   NormalizedPoint? _resolvePosition(
     int playerId,
     Map<int, NormalizedPoint> defaults,
-    Map<int, PlayerPosition> customs,
+    Map<int, PitchPosition> customs,
   ) {
     final custom = customs[playerId];
     if (custom != null) return NormalizedPoint(custom.x, custom.y);
@@ -404,7 +404,7 @@ class TacticalBoardPitchState extends State<TacticalBoardPitch> {
   void _handleDragUpdate(
     int playerId,
     TacticalTeamSide side,
-    Map<int, PlayerPosition> customs,
+    Map<int, PitchPosition> customs,
     double currentLeft,
     double currentTop,
     Offset delta,
@@ -421,7 +421,7 @@ class TacticalBoardPitchState extends State<TacticalBoardPitch> {
         (newCenterY / pitchHeight).clamp(DragVisuals.minY, DragVisuals.maxY);
 
     setState(() {
-      customs[playerId] = PlayerPosition(x: newX, y: newY);
+      customs[playerId] = PitchPosition(x: newX, y: newY);
       _dragCurrentPixel = Offset(
         newX * pitchWidth,
         newY * pitchHeight,

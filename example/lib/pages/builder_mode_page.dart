@@ -43,7 +43,7 @@ class _BuilderModePageState extends State<BuilderModePage> {
     final available = List<LineupPlayer>.from(_availableSquad);
 
     final gk = available.firstWhere(
-      (p) => p.position.toLowerCase().contains('goalkeeper'),
+      (p) => p.position == PlayerPosition.goalkeeper,
       orElse: () => available.first,
     );
     _selectedPlayers.add(gk);
@@ -109,8 +109,7 @@ class _BuilderModePageState extends State<BuilderModePage> {
             id: p.id,
             name: p.name,
             number: p.number,
-            position: i == 0 ? 'Goalkeeper' : p.position,
-            gridPosition: i == 0 ? 1 : 30 + i,
+            position: i == 0 ? PlayerPosition.goalkeeper : p.position,
             isCaptain: i == 0,
           );
         }).toList(),
@@ -335,7 +334,7 @@ class _SwapSheet extends StatelessWidget {
                       child: Text(player.number.toString()),
                     ),
                     title: Text(player.name ?? ''),
-                    subtitle: Text(player.position),
+                    subtitle: Text(player.position.name),
                     onTap: () => onSwap(player),
                   );
                 },

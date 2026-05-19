@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// The position category of a player on the pitch.
+enum PlayerPosition { goalkeeper, defender, midfielder, forward }
+
 /// Represents a single player to be rendered on the lineup pitch.
 ///
 /// This model is completely isolated from any app-specific entity or domain
@@ -13,28 +16,19 @@ import 'package:flutter/material.dart';
 ///   id: 7,
 ///   name: 'Saka',
 ///   number: 7,
-///   position: 'Forward',
-///   gridPosition: 100,
+///   position: PlayerPosition.forward,
 ///   rating: 8.2,
 ///   goals: 1,
 ///   assists: 1,
 ///   isCaptain: false,
 /// );
 /// ```
-///
-/// ## Grid Position
-///
-/// The [gridPosition] field determines the player's ordering within the
-/// formation layout. Lower values are placed closer to the goalkeeper row,
-/// higher values toward the forward line. The goalkeeper typically has a
-/// value below 25.
 class LineupPlayer {
   const LineupPlayer({
     required this.id,
     required this.number,
+    required this.position,
     this.name,
-    this.position = '',
-    this.gridPosition = 0,
     this.imageUrl,
     this.rating,
     this.isCaptain = false,
@@ -64,18 +58,10 @@ class LineupPlayer {
   /// available.
   final int number;
 
-  /// Position name (e.g. "Goalkeeper", "Defender", "Midfielder", "Forward").
+  /// Position category of this player.
   ///
   /// Used internally to identify the goalkeeper for special positioning.
-  /// A value of "G" or containing "goalkeeper" (case-insensitive) is treated
-  /// as the GK slot.
-  final String position;
-
-  /// Numeric value used for sorting players into formation rows.
-  ///
-  /// Lower values are placed in defensive rows, higher values in attacking rows.
-  /// The goalkeeper should have a value below 25 to be auto-detected.
-  final int gridPosition;
+  final PlayerPosition position;
 
   /// Optional URL for the player's photo or avatar image.
   ///
@@ -181,8 +167,9 @@ class LineupTeam {
 
   /// List of starting XI players to render on the pitch.
   ///
-  /// Players are sorted by [LineupPlayer.gridPosition] and distributed
-  /// across formation rows automatically.
+  /// The first player with [PlayerPosition.goalkeeper] is placed in the GK
+  /// slot. Remaining players are distributed across formation rows in list
+  /// order.
   final List<LineupPlayer> players;
 
   /// Optional team logo URL for display in headers or overlays.

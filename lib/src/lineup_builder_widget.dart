@@ -182,7 +182,7 @@ class LineupBuilder extends StatelessWidget {
   final void Function(LineupPlayer player)? onPlayerTap;
 
   /// Called when player positions change after a drag (editable mode).
-  final void Function(Map<int, PlayerPosition> positions)? onPositionsChanged;
+  final void Function(Map<int, PitchPosition> positions)? onPositionsChanged;
 
   /// Called when formation label changes (editable mode).
   ///
