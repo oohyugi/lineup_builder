@@ -100,10 +100,19 @@ class PositionedPlayer {
     return (gk: null, outfield: const []);
   }
 
-  final candidate = players.first;
-  if (candidate.position == PlayerPosition.goalkeeper) {
-    return (gk: candidate, outfield: players.sublist(1));
+  final gkIndex = players.indexWhere(
+    (p) => p.position == PlayerPosition.goalkeeper,
+  );
+
+  if (gkIndex != -1) {
+    final gk = players[gkIndex];
+    final outfield = [
+      ...players.sublist(0, gkIndex),
+      ...players.sublist(gkIndex + 1)
+    ];
+    return (gk: gk, outfield: outfield);
   }
+
   return (gk: null, outfield: players);
 }
 
