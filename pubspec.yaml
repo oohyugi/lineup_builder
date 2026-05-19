@@ -1,0 +1,17 @@
+name: lineup_builder
+description: A reusable Flutter lineup pitch widget for football/soccer formations. Supports display and builder modes.
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cached_network_image: ^3.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
