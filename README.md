@@ -2,6 +2,10 @@
 
 A reusable Flutter package for rendering football/soccer lineup formations on a pitch. Fully isolated from app-specific models — bring your own data, map it to `LineupPlayer`, and render.
 
+## Demo
+
+![Demo](screenshots/demo.gif)
+
 ## Screenshots
 
 | Display Mode | Builder Mode | Tactical Board |
@@ -17,7 +21,6 @@ A reusable Flutter package for rendering football/soccer lineup formations on a 
 - **Drag trail** — Meteor-like trail from start position to current drag position
 - **Haptic feedback** — Configurable haptic on drag start (light, medium, heavy, selection, vibrate)
 - **Customizable** — Override pitch colors, sizes, player node rendering
-- **Isolated** — No dependency on any app entity/model. Uses its own `LineupPlayer` model.
 
 ## Installation
 
