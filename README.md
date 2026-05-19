@@ -4,9 +4,9 @@ A reusable Flutter package for rendering football/soccer lineup formations on a 
 
 ## Screenshots
 
-| Builder Mode |
-|:---:|
-| ![Builder](screenshots/builder-mode.png) |
+| Display Mode | Builder Mode | Tactical Board |
+|:---:|:---:|:---:|
+| ![Display](screenshots/display.png) | ![Builder](screenshots/builder-mode.png) | ![Tactical](screenshots/tactical-board.png) |
 
 ## Features
 
